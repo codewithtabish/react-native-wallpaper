@@ -7,15 +7,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import ThemedContainer from "@/components/ThemedContainer"
 import { FontAwesome6 } from "@expo/vector-icons"
-import { common, theme } from "@/constants"
+import { catrgories, common, theme } from "@/constants"
 import { AntDesign } from "@expo/vector-icons"
+import Categories from "@/components/Categories"
 
 const HomeScreen = () => {
   const [search, setSearch] = useState<any>()
-  const [searchInputRef, setsearchInputRef] = useState<any>()
+  const searchInputRef = useRef<any>()
+  const [category, setCategory] = useState<any>()
+
+  const handleCategory = (cat: string) => {
+    setCategory(cat)
+  }
+
   return (
     <ThemedContainer>
       <View
@@ -53,7 +60,7 @@ const HomeScreen = () => {
           </View>
           <View style={styles.searchInput}>
             <TextInput
-              ref={setsearchInputRef}
+              ref={searchInputRef}
               value={search}
               onChangeText={(text) => setSearch(text)}
               placeholder="search something"
@@ -72,6 +79,9 @@ const HomeScreen = () => {
               />
             </TouchableOpacity>
           )}
+        </View>
+        <View style={{ paddingRight: common.wp(0) }}>
+          <Categories category={category} handleCategory={handleCategory} />
         </View>
       </ScrollView>
     </ThemedContainer>
@@ -107,3 +117,5 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.sm,
   },
 })
+
+// 43631310 - d68b96cf3fd0acd74f5306b77
