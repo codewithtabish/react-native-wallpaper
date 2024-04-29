@@ -1,0 +1,7 @@
+{
+    "editor.formatOnSave": true,
+    "reactSnippets.settings.prettierEnabled": true,
+    "prettier.insertPragma": true,
+    "prettier.requireConfig": true,
+    "prettier.requirePragma": true
+}
