@@ -7,20 +7,87 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import React, { useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import ThemedContainer from "@/components/ThemedContainer"
 import { FontAwesome6 } from "@expo/vector-icons"
-import { catrgories, common, theme } from "@/constants"
+import { catrgories, common, theme, images } from "@/constants"
 import { AntDesign } from "@expo/vector-icons"
 import Categories from "@/components/Categories"
+import { apiCall } from "@/api"
+import ImagesGrid from "@/components/ImagesGrid"
+import _ from "lodash"
+
+let page = 1
 
 const HomeScreen = () => {
   const [search, setSearch] = useState<any>()
   const searchInputRef = useRef<any>()
   const [category, setCategory] = useState<any>()
+  const [images, setImages] = useState<any>([])
+  const [someSearch, setsomeSearch] = useState(false)
 
-  const handleCategory = (cat: string) => {
-    setCategory(cat)
+  const handleCategory = useCallback(
+    (item: any) => {
+      setCategory(item)
+    },
+    [category],
+  )
+
+  const handleSearch = useCallback(
+    (value: any) => {
+      setSearch(value)
+    },
+    [search],
+  )
+
+  useEffect(() => {
+    fetchImages({ page: 1 }, true)
+
+    return () => {}
+  }, [])
+
+  const fetchImages = async (params = { page: 1 }, append = false) => {
+    const response = await apiCall(params)
+    if (response.success && response.data.hits.length > 0) {
+      if (append) {
+        setImages([...images, ...response.data.hits])
+      } else {
+        setImages([...response.data.hits])
+      }
+    }
+  }
+
+  const handleSearchDebounce = useCallback(
+    _.debounce((text) => {
+      // setSearch(text)
+      if (text.length > 2) {
+        // setSearch(true)
+        setsomeSearch(true)
+        setTimeout(() => {}, 2000)
+        page = 1
+        setImages([])
+        fetchImages({ q: text, page: 1 })
+      }
+      if (text === "") {
+        setsomeSearch(false)
+        page = 1
+        setImages([])
+        fetchImages({ page: 1 })
+      }
+    }, 400),
+    [],
+  )
+
+  const onChangeText = (text) => {
+    // searchInputRef.current = text.toString().trim()
+    handleSearchDebounce(text)
+    setSearch(text)
+  }
+
+  const clearText = () => {
+    setSearch("")
+    searchInputRef.current.clear()
+    fetchImages({ page })
   }
 
   return (
@@ -61,17 +128,20 @@ const HomeScreen = () => {
           <View style={styles.searchInput}>
             <TextInput
               ref={searchInputRef}
-              value={search}
-              onChangeText={(text) => setSearch(text)}
+              // value={search}
+              onChangeText={onChangeText}
               placeholder="search something"
               style={{
                 fontSize: common.hp(1.9),
                 color: theme.colors.neutral(0.5),
+                paddingVertical: 4,
+                borderWidth: 0,
+                borderColor: "red",
               }}
             />
           </View>
           {search && (
-            <TouchableOpacity style={styles.closeIcon}>
+            <TouchableOpacity style={styles.closeIcon} onPress={clearText}>
               <AntDesign
                 name="close"
                 size={24}
@@ -83,6 +153,12 @@ const HomeScreen = () => {
         <View style={{ paddingRight: common.wp(0) }}>
           <Categories category={category} handleCategory={handleCategory} />
         </View>
+        {/* <Text style={{ margin: 20 }}>{images?.length}</Text> */}
+        {someSearch && images?.length === 0 ? (
+          <Text style={{ margin: 20 }}>No result found</Text>
+        ) : (
+          <ImagesGrid images={images} />
+        )}
       </ScrollView>
     </ThemedContainer>
   )
@@ -113,9 +189,11 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     backgroundColor: theme.colors.neutral(0.1),
-    padding: 6,
+    padding: 8,
     borderRadius: theme.radius.sm,
   },
 })
 
 // 43631310 - d68b96cf3fd0acd74f5306b77
+
+// https://pixabay.com/api/?key=43631310-d68b96cf3fd0acd74f5306b77&per_page=100&safesearch=true&editors_choice=true&page=1&q=programming

@@ -46,7 +46,7 @@ const Categories = ({ category, handleCategory }: any) => {
   )
 }
 
-export default Categories
+export default React.memo(Categories)
 
 const styles = StyleSheet.create({
   contentContainer: {
