@@ -28,7 +28,16 @@ const HomeScreen = () => {
 
   const handleCategory = useCallback(
     (item: any) => {
+      // if (category === item) {
+      // alert("es")
+      // setCategory("")
+      // }
       setCategory(item)
+      clearText()
+      setImages([])
+      let params = { page }
+      if (item) params = { category: item, page }
+      fetchImages(params, false)
     },
     [category],
   )
@@ -82,9 +91,10 @@ const HomeScreen = () => {
     // searchInputRef.current = text.toString().trim()
     handleSearchDebounce(text)
     setSearch(text)
+    setCategory("")
   }
 
-  const clearText = () => {
+  function clearText() {
     setSearch("")
     searchInputRef.current.clear()
     fetchImages({ page })

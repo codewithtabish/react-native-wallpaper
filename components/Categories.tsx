@@ -20,7 +20,13 @@ const Categories = ({ category, handleCategory }: any) => {
       >
         <Pressable
           style={[styles.category, { backgroundColor: backgroundColor }]}
-          onPress={() => handleCategory(item)}
+          onPress={() => {
+            if (category === item) {
+              handleCategory("")
+            } else {
+              handleCategory(item)
+            }
+          }}
         >
           <Text style={[styles.title, { color: color }]}>{item}</Text>
         </Pressable>
