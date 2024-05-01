@@ -21,4 +21,26 @@ const categories: string[] = [
   "music",
 ]
 
-export default { categories }
+const myFilterArray = {
+  Order: ["popular", "latest"],
+  Orientataion: ["all", "horizontal", "vertical"],
+  Type: ["all", "photo", "illustration", "vector"],
+  Colors: [
+    "grayscale",
+    "transparent",
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "turquoise",
+    "blue",
+    "lilac",
+    "pink",
+    "white",
+    "gray",
+    "black",
+    "brown",
+  ],
+}
+
+export default { categories, myFilterArray }

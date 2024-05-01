@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,6 +17,8 @@ import Categories from "@/components/Categories"
 import { apiCall } from "@/api"
 import ImagesGrid from "@/components/ImagesGrid"
 import _ from "lodash"
+import FilterModel from "@/components/FilterModel"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 
 let page = 1
 
@@ -25,6 +28,9 @@ const HomeScreen = () => {
   const [category, setCategory] = useState<any>()
   const [images, setImages] = useState<any>([])
   const [someSearch, setsomeSearch] = useState(false)
+  const modalRef = useRef(null)
+  const [filterData, setfilterData] = useState()
+  const [selectedOptions, setSelectedOptions] = useState({})
 
   const handleCategory = useCallback(
     (item: any) => {
@@ -38,6 +44,7 @@ const HomeScreen = () => {
       let params = { page }
       if (item) params = { category: item, page }
       fetchImages(params, false)
+      setSelectedOptions({})
     },
     [category],
   )
@@ -100,77 +107,130 @@ const HomeScreen = () => {
     fetchImages({ page })
   }
 
+  // callbacks
+  const openModal = useCallback(() => {
+    modalRef?.current?.present()
+  }, [])
+  const closeModal = () => {
+    modalRef?.current?.close()
+  }
+
+  const handleFilter = () => {
+    // Implement your filter logic here
+    console.log("Applying filters:", selectedOptions)
+    // setCategory("")
+    // Extract the selected options based on the category
+    const { Colors, Order, Orientation, Type } = selectedOptions
+    const obj = {
+      colors: Colors,
+      order: Order,
+      orientation: Orientation,
+      page,
+    }
+    if (category) obj.category = category
+    if (search) obj.q = search
+
+    fetchImages(obj)
+    setSelectedOptions({})
+
+    closeModal()
+    // const { Type, Colors, Corder } = selectedOptions
+    // const data = [...Type, ...Colors, ...Corder]
+    // console.log(data)
+    // console.log(Type, Colors, Corder)
+  }
+
+  const handleReset = () => {
+    setSelectedOptions({})
+    fetchImages({ page })
+  }
+
   return (
-    <ThemedContainer>
-      <View
-        style={{
-          marginHorizontal: common.wp(4),
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginVertical: common.hp(1),
-        }}
-      >
-        <Pressable>
-          <Text
-            style={{
-              fontSize: common.hp(4),
-              color: theme.colors.neutral(0.6),
-              fontWeight: theme.fontWeights.semibold,
-            }}
-          >
-            PixelPrime
-          </Text>
-        </Pressable>
-        <TouchableOpacity>
-          <FontAwesome6 name="bars-staggered" size={22} />
-        </TouchableOpacity>
-      </View>
-      <ScrollView>
-        <View style={styles.searchBox}>
-          <View style={styles.searchIcon}>
-            <AntDesign
-              name="search1"
-              size={24}
-              color={theme.colors.neutral(0.4)}
-            />
-          </View>
-          <View style={styles.searchInput}>
-            <TextInput
-              ref={searchInputRef}
-              // value={search}
-              onChangeText={onChangeText}
-              placeholder="search something"
+    <>
+      <ThemedContainer>
+        <View
+          style={{
+            marginHorizontal: common.wp(4),
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginVertical: common.hp(1),
+          }}
+        >
+          <Pressable>
+            <Text
               style={{
-                fontSize: common.hp(1.9),
-                color: theme.colors.neutral(0.5),
-                paddingVertical: 4,
-                borderWidth: 0,
-                borderColor: "red",
+                fontSize: common.hp(4),
+                color: theme.colors.neutral(0.6),
+                fontWeight: theme.fontWeights.semibold,
               }}
-            />
-          </View>
-          {search && (
-            <TouchableOpacity style={styles.closeIcon} onPress={clearText}>
+            >
+              PixelPrime
+            </Text>
+          </Pressable>
+          <TouchableOpacity onPress={openModal}>
+            <FontAwesome6 name="bars-staggered" size={22} />
+          </TouchableOpacity>
+        </View>
+        <ScrollView contentContainerStyle={{}}>
+          <View style={styles.searchBox}>
+            <View style={styles.searchIcon}>
               <AntDesign
-                name="close"
+                name="search1"
                 size={24}
-                color={theme.colors.neutral(0.6)}
+                color={theme.colors.neutral(0.4)}
               />
-            </TouchableOpacity>
+            </View>
+            <View style={styles.searchInput}>
+              <TextInput
+                ref={searchInputRef}
+                // value={search}
+                onChangeText={onChangeText}
+                placeholder="search something"
+                style={{
+                  fontSize: common.hp(1.9),
+                  color: theme.colors.neutral(0.5),
+                  paddingVertical: 4,
+                  borderWidth: 0,
+                  borderColor: "red",
+                }}
+              />
+            </View>
+            {search && (
+              <TouchableOpacity style={styles.closeIcon} onPress={clearText}>
+                <AntDesign
+                  name="close"
+                  size={24}
+                  color={theme.colors.neutral(0.6)}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={{ paddingRight: common.wp(0) }}>
+            <Categories category={category} handleCategory={handleCategory} />
+          </View>
+          {/* <Text style={{ margin: 20 }}>{images?.length}</Text> */}
+          {someSearch && images?.length === 0 ? (
+            <Text style={{ margin: 20 }}>No result found</Text>
+          ) : (
+            <ImagesGrid images={images} />
           )}
-        </View>
-        <View style={{ paddingRight: common.wp(0) }}>
-          <Categories category={category} handleCategory={handleCategory} />
-        </View>
-        {/* <Text style={{ margin: 20 }}>{images?.length}</Text> */}
-        {someSearch && images?.length === 0 ? (
-          <Text style={{ margin: 20 }}>No result found</Text>
-        ) : (
-          <ImagesGrid images={images} />
-        )}
-      </ScrollView>
-    </ThemedContainer>
+        </ScrollView>
+
+        {/* <View style={{ height: common.hp(100) }}> */}
+        {/* </View> */}
+        <FilterModel
+          modalRef={modalRef}
+          closeModal={closeModal}
+          filterData={filterData}
+          setfilterData={setfilterData}
+          handleFilter={handleFilter}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
+          handleReset={handleReset}
+        />
+      </ThemedContainer>
+    </>
   )
 }
 
