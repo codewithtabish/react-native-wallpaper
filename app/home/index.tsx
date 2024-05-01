@@ -31,6 +31,9 @@ const HomeScreen = () => {
   const modalRef = useRef(null)
   const [filterData, setfilterData] = useState()
   const [selectedOptions, setSelectedOptions] = useState({})
+  const scrollRef = useRef(null)
+  const [isEndReached, setisEndReached] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleCategory = useCallback(
     (item: any) => {
@@ -62,7 +65,7 @@ const HomeScreen = () => {
     return () => {}
   }, [])
 
-  const fetchImages = async (params = { page: 1 }, append = false) => {
+  const fetchImages = async (params = { page: 1 }, append = true) => {
     const response = await apiCall(params)
     if (response.success && response.data.hits.length > 0) {
       if (append) {
@@ -145,10 +148,79 @@ const HomeScreen = () => {
     fetchImages({ page })
   }
 
+  const handleScroll = (event) => {
+    const { contentSize, contentOffset, layoutMeasurement } = event.nativeEvent
+    const scrollHeight = contentSize.height - layoutMeasurement.height
+    const scrollOffset = contentOffset.y
+
+    if (scrollOffset >= scrollHeight - 0.8 && !isEndReached && !isLoading) {
+      setIsLoading(true)
+      page = page + 1
+      let params = {
+        ...selectedOptions,
+        page,
+      }
+      if (search) params.q = search
+      if (category) params.category = category
+      console.log("YES I AM HERE ")
+
+      fetchImages(params)
+        .then(() => {
+          setIsLoading(false)
+        })
+        .catch(() => {
+          setIsLoading(false)
+        })
+      // setPage((prevPage) => prevPage + 1)
+    }
+  }
+
+  const handleScrollB = (event) => {
+    const contentHeight = event.nativeEvent.contentSize.height
+    const scrollHeight = event.nativeEvent.layoutMeasurement.height
+    const offset = event.nativeEvent.contentOffset.y
+    const bottomPosition = contentHeight - scrollHeight
+    if (offset >= bottomPosition - 1) {
+      if (!isEndReached) {
+        setisEndReached(true)
+        page = page + 1
+        let params = {
+          // ...selectedOptions,
+          page,
+        }
+        if (search) params.q = search
+        if (category) params.category = category
+        console.log("YES I AM HERE ")
+
+        fetchImages(params)
+      } else if (isEndReached) {
+        setisEndReached(false)
+      }
+    }
+
+    // if (offset + scrollHeight >= contentHeight - 10) {
+    //   console.log("yes")
+    //   page = page + 1
+    //   let params = {
+    //     // ...selectedOptions,
+    //     page,
+    //   }
+    //   if (search) params.q = search
+    //   if (category) params.category = category
+
+    //   fetchImages(params)
+    // }
+  }
+
+  const handleScrollUp = () => {
+    scrollRef?.current?.scrollTo({ y: 0, animated: true })
+  }
+
   return (
     <>
       <ThemedContainer>
-        <View
+        <Pressable
+          onPress={handleScrollUp}
           style={{
             marginHorizontal: common.wp(4),
             flexDirection: "row",
@@ -157,7 +229,7 @@ const HomeScreen = () => {
             marginVertical: common.hp(1),
           }}
         >
-          <Pressable>
+          <Pressable onPress={handleScrollUp}>
             <Text
               style={{
                 fontSize: common.hp(4),
@@ -171,9 +243,14 @@ const HomeScreen = () => {
           <TouchableOpacity onPress={openModal}>
             <FontAwesome6 name="bars-staggered" size={22} />
           </TouchableOpacity>
-        </View>
-        <ScrollView contentContainerStyle={{}}>
-          <View style={styles.searchBox}>
+        </Pressable>
+        <ScrollView
+          contentContainerStyle={{}}
+          onScroll={handleScroll}
+          scrollEventThrottle={10}
+          ref={scrollRef}
+        >
+          <Pressable style={styles.searchBox} onPress={handleScrollUp}>
             <View style={styles.searchIcon}>
               <AntDesign
                 name="search1"
@@ -205,7 +282,7 @@ const HomeScreen = () => {
                 />
               </TouchableOpacity>
             )}
-          </View>
+          </Pressable>
           <View style={{ paddingRight: common.wp(0) }}>
             <Categories category={category} handleCategory={handleCategory} />
           </View>
@@ -214,6 +291,11 @@ const HomeScreen = () => {
             <Text style={{ margin: 20 }}>No result found</Text>
           ) : (
             <ImagesGrid images={images} />
+          )}
+          {isLoading && (
+            <View style={[styles.loaderContainer]}>
+              <ActivityIndicator size="large" color={"gray"} />
+            </View>
           )}
         </ScrollView>
 
@@ -261,6 +343,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.neutral(0.1),
     padding: 8,
     borderRadius: theme.radius.sm,
+  },
+  loaderContainer: {
+    paddingVertical: 20,
+    alignItems: "center",
+    // marginBottom: 70,
   },
 })
 

@@ -1,26 +1,33 @@
 import { StyleSheet, Text, View } from "react-native"
-import React from "react"
+import React, { memo } from "react"
 import { MasonryFlashList } from "@shopify/flash-list"
 import { common } from "@/constants"
 import ImageCard from "./ImageCard"
 
-const ImagesGrid = ({ images }: any) => {
-  const column = common.getColumnCount()
-  return (
-    <View style={styles.container}>
-      <MasonryFlashList
-        data={images}
-        keyExtractor={(item) => item.id}
-        numColumns={column}
-        contentContainerStyle={styles.contentContainer}
-        renderItem={({ item, index }) => (
-          <ImageCard item={item} index={index} column={column} />
-        )}
-        estimatedItemSize={30}
-      />
-    </View>
-  )
-}
+const ImagesGrid = memo(
+  ({ images }: any) => {
+    const column = common.getColumnCount()
+    console.log("GRID IS CALLING")
+    return (
+      <View style={styles.container}>
+        <MasonryFlashList
+          data={images}
+          keyExtractor={(item) => item.id}
+          numColumns={column}
+          contentContainerStyle={styles.contentContainer}
+          renderItem={({ item, index }) => (
+            <ImageCard item={item} index={index} column={column} />
+          )}
+          estimatedItemSize={30}
+        />
+      </View>
+    )
+  },
+  (prevProps, nextProps) => {
+    // Compare the `images` array between previous and next props
+    return prevProps.images === nextProps.images
+  },
+)
 
 export default ImagesGrid
 
