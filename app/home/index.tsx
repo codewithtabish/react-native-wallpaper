@@ -19,6 +19,7 @@ import ImagesGrid from "@/components/ImagesGrid"
 import _ from "lodash"
 import FilterModel from "@/components/FilterModel"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import { useRouter } from "expo-router"
 
 let page = 1
 
@@ -34,6 +35,7 @@ const HomeScreen = () => {
   const scrollRef = useRef(null)
   const [isEndReached, setisEndReached] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const handleCategory = useCallback(
     (item: any) => {
@@ -127,7 +129,7 @@ const HomeScreen = () => {
     const obj = {
       colors: Colors,
       order: Order,
-      orientation: Orientation,
+      Orientation,
       page,
     }
     if (category) obj.category = category
@@ -290,7 +292,7 @@ const HomeScreen = () => {
           {someSearch && images?.length === 0 ? (
             <Text style={{ margin: 20 }}>No result found</Text>
           ) : (
-            <ImagesGrid images={images} />
+            <ImagesGrid images={images} router={router} />
           )}
           {isLoading && (
             <View style={[styles.loaderContainer]}>

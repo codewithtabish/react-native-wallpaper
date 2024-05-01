@@ -12,6 +12,17 @@ const _layout = () => {
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="home/index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="home/image"
+            options={{
+              headerShown: false,
+              gestureEnabled: true,
+              presentation: "modal",
+              // presentation: "fullScreenModal",
+              // presentation: "transparentModal",
+              animation: "fade",
+            }}
+          />
         </Stack>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

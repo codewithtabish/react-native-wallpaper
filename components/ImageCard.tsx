@@ -3,7 +3,7 @@ import React from "react"
 import { Image } from "expo-image"
 import { common, theme } from "@/constants"
 
-const ImageCard = ({ item, index, column }: any) => {
+const ImageCard = ({ item, index, column, router }: any) => {
   const blurhash =
     "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj["
 
@@ -19,7 +19,12 @@ const ImageCard = ({ item, index, column }: any) => {
   //
 
   return (
-    <Pressable style={[styles.imageWrapper, !lastInRow() && styles.spacing]}>
+    <Pressable
+      style={[styles.imageWrapper, !lastInRow() && styles.spacing]}
+      onPress={() =>
+        router.push({ pathname: "home/image", params: { ...item } })
+      }
+    >
       <Image
         style={[styles.itemImage, getImageHeight()]}
         source={{ uri: item?.webformatURL }}

@@ -20,7 +20,6 @@ export const apiCall = async (params) => {
     const response = await axios.get(formatUrl(params))
     return { success: true, data: response.data }
   } catch (error) {
-    console.log("The error is", error.msg)
     return { success: false, error: error.msg }
   }
 }
