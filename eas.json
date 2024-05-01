@@ -1,32 +1,28 @@
 {
-  "expo": {
-    "name": "My Expo App",
-    "slug": "my-expo-app",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": ["**/*"],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+  "cli": {
+    "version": ">= 7.8.5"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "ios": {
+        "buildType": "archive"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview"
     },
-    "logLevel": "verbose"
+    "production": {
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {}
   }
 }
