@@ -20,6 +20,7 @@ import _ from "lodash"
 import FilterModel from "@/components/FilterModel"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { useRouter } from "expo-router"
+import { StatusBar } from "expo-status-bar"
 
 let page = 1
 
@@ -221,6 +222,7 @@ const HomeScreen = () => {
   return (
     <>
       <ThemedContainer>
+        <StatusBar style="dark" backgroundColor={"white"} />
         <Pressable
           onPress={handleScrollUp}
           style={{

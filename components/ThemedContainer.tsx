@@ -7,12 +7,12 @@ import { theme } from "@/constants"
 const ThemedContainer = ({ children }: any) => {
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar style="dark" backgroundColor={"white"} />
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1 }}>
           <View style={{ flex: 1, backgroundColor: theme.colors.white }}>
             {children}
           </View>
-          <StatusBar style="dark" />
         </SafeAreaView>
       </SafeAreaProvider>
     </View>

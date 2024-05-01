@@ -88,7 +88,7 @@ const WelcomeScreen = () => {
           </Animated.View>
         </View>
       </View>
-      <StatusBar style="dark" />
+      <StatusBar style="dark" backgroundColor={"white"} />
     </ThemedContainer>
   )
 }
